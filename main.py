@@ -7,6 +7,7 @@ arr = []
 
 
 for row in dataFrameReader.iter_rows(0, dataFrameReader.max_row):
-    arr.append(row[3].value)
-print(arr)
+    arr.append(row[4].value)
 
+arr.sort()
+print(arr)
