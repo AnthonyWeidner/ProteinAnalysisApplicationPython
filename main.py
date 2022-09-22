@@ -1,5 +1,12 @@
-# This is a sample Python script.
+import openpyxl
 
+dataFrame = openpyxl.load_workbook("/Users/maggiechen/Downloads/SpNdirDIA_QizhiSwab-23EvoToF24aug_quan.xlsx")
+
+dataFrameReader = dataFrame.active
+
+for row in range(0, 3):
+    for col in dataFrameReader.iter_cols(1, dataFrameReader.max_column):
+        print(col[row].value)
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
