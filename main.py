@@ -5,6 +5,7 @@ dataFrame = openpyxl.load_workbook("/Users/maggiechen/Downloads/SpNdirDIA_QizhiS
 dataFrameReader = dataFrame.active
 arr = []
 
+
 sampleName = ""
 flag = True
 counter = 0
@@ -26,5 +27,3 @@ for col in range(5, dataFrameReader.max_column):
     counter += 1
     flag = True
 
-arr.sort()
-print(arr)
