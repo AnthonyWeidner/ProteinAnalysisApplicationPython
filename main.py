@@ -5,7 +5,6 @@ dataFrame = openpyxl.load_workbook("/Users/maggiechen/Downloads/SpNdirDIA_QizhiS
 dataFrameReader = dataFrame.active
 arr = []
 
-
 sampleName = ""
 flag = True
 counter = 0
