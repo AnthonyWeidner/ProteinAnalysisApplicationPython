@@ -1,6 +1,13 @@
+import tkinter
 import openpyxl
+import tkinter.filedialog
 
-dataFrame = openpyxl.load_workbook("/Users/maggiechen/Downloads/SpNdirDIA_QizhiSwab-23EvoToF24aug_quan.xlsx")
+root = tkinter.Tk()
+root.withdraw
+dirname = tkinter.filedialog.askdirectory(parent=root, initialdir="/",
+                                    title='Please select a directory')
+
+dataFrame = openpyxl.load_workbook(dirname)
 
 dataFrameReader = dataFrame.active
 arr = []
