@@ -1,30 +1,10 @@
-import tkinter
 import openpyxl
 import tkinter.filedialog
-
-# importing the required modules
-#from tkinter import *                   # importing all the widgets and modules from tkinter
-#from tkinter import messagebox as mb    # importing the messagebox module from tkinter
-#from tkinter import filedialog as fd    # importing the filedialog module from tkinter
-#import os                               # importing the os module
-#import shutil                           # importing the shutil module
 
 root = tkinter.Tk()
 root.withdraw
 fileName1 = tkinter.filedialog.askopenfilename()
 
-# ----------------- defining functions -----------------
-# function to open a file
-#def openFile():
-   # selecting the file using the askopenfilename() method of filedialog
- #  the_file = fd.askopenfilename(
-  #    title = "Select a file of any type",
-   #   filetypes = [("All files", "*.*")]
-    #  )
-   # opening a file using the startfile() method of the os module
-   #os.startfile(os.path.abspath(the_file))
-
-#openFile()
 dataFrame = openpyxl.load_workbook(fileName1)
 
 dataFrameReader = dataFrame.active
