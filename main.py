@@ -11,6 +11,9 @@ from matplotlib import pyplot as plt
 # protein_name: name of protein
 # desired_p_val: the value that the user entered for the desired p-value (i.e. 0.05, 0.01)
 # mu: population mean
+
+
+# TODO: improve p-value function
 def pvalue_101(choice, protein_name, desired_p_val, mu, sigma, samp_size, samp_mean=0, deltam=0):
     np.random.seed(1234)
     s1 = np.random.normal(mu, sigma, samp_size)  # simulate random normal distribution
@@ -27,13 +30,13 @@ def pvalue_101(choice, protein_name, desired_p_val, mu, sigma, samp_size, samp_m
         print('Percentage of numbers significantly larger than the control mean is {}% for {}'.format(outliers, protein_name))
 
     percentage_needed = 1 - desired_p_val
-    if outliers < percentage_needed and choice == "y":
+    if outliers < percentage_needed and choice == "y" and samp_size > 5:
         fig, ax = plt.subplots(figsize=(8,8))
         #fig.suptitle('Normal Distribution: population_mean={}'.format(mu) )
         fig.suptitle('Normal Distribution: population_mean for {}'.format(protein_name))
         plt.hist(s1)
-        plt.axvline(x=mu+deltam, color='red')
-        plt.axvline(x=mu-deltam, color='green')
+        plt.axvline(x=sigma, color='red')
+        #plt.axvline(x=mu-deltam, color='green')
         plt.show()
 
     return outliers
@@ -116,6 +119,6 @@ for key,val in sampleData.items():
     proteinSampleDataMappedToMean[key].append(statistics.mean(val))
 
     controlMean = controlDataMap[key]
-    proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, 20.0, (int)(proteinSampleDataMappedToMean[key][0]), 33))
+    proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMap[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
 
 #print(pvalue_101(controlDataMap["Immunoglobulin lambda variable 3-9"], 20.0, (int)(proteinSampleDataMappedToMean["Immunoglobulin lambda variable 3-9"][0]), 33.0))
