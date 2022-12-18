@@ -85,12 +85,21 @@ rowCounter = 0
 controlDataMap = {}
 for row in dataFrameReader.iter_rows(2, dataFrameReader.max_row):
     proteinName = row[2].value
-    value = row[5].value
-    if isinstance(value, str):  # Filtered as value
-        value = 50  # test value, change
+    controlDataMap[proteinName] = []
+    for col in range(5, 13):
+        value = row[col].value
+        if not isinstance(value, str):  # Filtered as value
+            controlDataMap[proteinName].append(value)
+        else:
+            controlDataMap[proteinName].append(50)
 
-    controlDataMap[proteinName] = value
 
+controlDataMappedToMean = {}
+for key,val in controlDataMap.items():
+    if len(val) <= 0:
+        continue
+    mean = statistics.mean(val)
+    controlDataMappedToMean[key] = mean
 
 # get data from left --> right
 # key = proteinName
@@ -118,7 +127,6 @@ for key,val in sampleData.items():
     proteinSampleDataMappedToMean[key] = []
     proteinSampleDataMappedToMean[key].append(statistics.mean(val))
 
-    controlMean = controlDataMap[key]
-    proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMap[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
+    proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMappedToMean[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
 
 #print(pvalue_101(controlDataMap["Immunoglobulin lambda variable 3-9"], 20.0, (int)(proteinSampleDataMappedToMean["Immunoglobulin lambda variable 3-9"][0]), 33.0))
