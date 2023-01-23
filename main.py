@@ -12,6 +12,25 @@ from matplotlib import pyplot as plt
 # desired_p_val: the value that the user entered for the desired p-value (i.e. 0.05, 0.01)
 # mu: population mean
 
+import mpl_interactions.ipyplot as iplt
+import matplotlib.pyplot as plt
+import numpy
+
+x = np.linspace(0, numpy.pi, 100)
+tau = np.linspace(0.5, 10, 100)
+
+def f1(x, tau, beta):
+    return numpy.sin(x * tau) * x * beta
+def f2(x, tau, beta):
+    return numpy.sin(x * beta) * x * tau
+
+
+fig, ax = plt.subplots()
+controls = iplt.plot(x, f1, tau=tau, beta=(1, 10, 100), label="f1")
+iplt.plot(x, f2, controls=controls, label="f2")
+_ = plt.legend()
+plt.show()
+
 
 # TODO: improve p-value function
 def pvalue_101(choice, protein_name, desired_p_val, mu, sigma, samp_size, samp_mean=0, deltam=0):
