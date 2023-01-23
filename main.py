@@ -5,6 +5,8 @@ import statistics
 
 from matplotlib import pyplot as plt
 
+from matplotlib.widgets import Button
+
 
 # @params:
 # choice: whether user wants to display graphical representation of results or not
