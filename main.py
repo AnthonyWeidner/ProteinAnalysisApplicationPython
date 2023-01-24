@@ -3,9 +3,64 @@ import openpyxl
 import tkinter.filedialog
 import statistics
 
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
-from matplotlib.widgets import Button
+#from matplotlib.widgets import Button
+#import mpl_interactions.ipyplot as iplt
+
+
+
+import mpl_interactions.ipyplot as iplt
+import matplotlib.pyplot as plt
+import numpy as np
+
+#x = np.linspace(0, np.pi, 100)
+#tau = np.linspace(0.5, 10, 100)
+
+#def f1(x, tau, beta):
+#    return np.sin(x * tau) * x * beta
+#def f2(x, tau, beta):
+#    return np.sin(x * beta) * x * tau
+
+
+#fig, ax = plt.subplots()
+#controls = iplt.plot(x, f1, tau=tau, beta=(1, 10, 100), label="f1")
+#iplt.plot(x, f2, controls=controls, label="f2")
+#_ = plt.legend()
+#plt.show()
+
+
+
+x = np.linspace(0, np.pi, 100)
+p_val = np.linspace(0,10,100)
+
+def graph1(x, p_val, mu):
+    return x * p_val * mu
+
+
+# ACCEPTANCE CRITERA
+# AC01: if p value, have a list of proteins fitting the p value
+# AC02: bar graph of each individual sample to see variation
+# AC03: add typable p value
+
+
+# NEW FUNCTIONALITY
+def proteinMeanGraph(protein_name, mu):
+    fig, ax = plt.subplots()
+    controls = iplt.plot(x, graph1, p_val=p_val, mu = mu, label=protein_name)
+    #iplt.plot(x, graph1, controls=controls)
+
+    _ = plt.legend()
+
+    plt.show()
+
+
+####################
+
+
+
+
+
 
 
 # @params:
@@ -129,6 +184,7 @@ for key,val in sampleData.items():
     proteinSampleDataMappedToMean[key] = []
     proteinSampleDataMappedToMean[key].append(statistics.mean(val))
 
-    proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMappedToMean[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
+    #proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMappedToMean[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
+    proteinSampleDataMappedToMean[key].append(proteinMeanGraph(key, controlDataMappedToMean[key]))
 
 #print(pvalue_101(controlDataMap["Immunoglobulin lambda variable 3-9"], 20.0, (int)(proteinSampleDataMappedToMean["Immunoglobulin lambda variable 3-9"][0]), 33.0))
