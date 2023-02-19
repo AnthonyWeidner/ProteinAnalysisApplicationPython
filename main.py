@@ -21,112 +21,12 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-app = dash.Dash(__name__)
-
-# ---------------------------------------------------------------
-
-df = pd.read_csv(
-    "C:\\Users\\antho\\Downloads\\DOHMH_New_York_City_Restaurant_Inspection_Results.csv")  # https://drive.google.com/file/d/1jyvSiRjaNIeOCP59dUFQuZ0_N_StiQOr/view?usp=sharing
-df['INSPECTION DATE'] = pd.to_datetime(df['INSPECTION DATE'])
-df = df.groupby(['INSPECTION DATE', 'CUISINE DESCRIPTION', 'CAMIS'], as_index=False)['SCORE'].mean()
-df = df.set_index('INSPECTION DATE')
-df = df.loc['2016-01-01':'2019-12-31']
-df = df.groupby([pd.Grouper(freq="M"), 'CUISINE DESCRIPTION'])['SCORE'].mean().reset_index()
-# print (df[:5])
-
-# ---------------------------------------------------------------
-app.layout = html.Div([
-
-    html.Div([
-        dcc.Graph(id='our_graph')
-    ], className='nine columns'),
-
-    html.Div([
-
-        html.Br(),
-        html.Label(['Choose 3 Cuisines to Compare:'], style={'font-weight': 'bold', "text-align": "center"}),
-        dcc.Dropdown(id='cuisine_one',
-                     options=[{'label': x, 'value': x} for x in
-                              df.sort_values('CUISINE DESCRIPTION')['CUISINE DESCRIPTION'].unique()],
-                     value='African',
-                     multi=False,
-                     disabled=False,
-                     clearable=True,
-                     searchable=True,
-                     placeholder='Choose Cuisine...',
-                     className='form-dropdown',
-                     style={'width': "90%"},
-                     persistence='string',
-                     persistence_type='memory'),
-
-        dcc.Dropdown(id='cuisine_two',
-                     options=[{'label': x, 'value': x} for x in
-                              df.sort_values('CUISINE DESCRIPTION')['CUISINE DESCRIPTION'].unique()],
-                     value='Asian',
-                     multi=False,
-                     clearable=False,
-                     persistence='string',
-                     persistence_type='session'),
-
-        dcc.Dropdown(id='cuisine_three',
-                     options=[{'label': x, 'value': x} for x in
-                              df.sort_values('CUISINE DESCRIPTION')['CUISINE DESCRIPTION'].unique()],
-                     value='Donuts',
-                     multi=False,
-                     clearable=False,
-                     persistence='string',
-                     persistence_type='local'),
-
-    ], className='three columns'),
-
-])
-
-
-# ---------------------------------------------------------------
-
-@app.callback(
-    Output('our_graph', 'figure'),
-    [Input('cuisine_one', 'value'),
-     Input('cuisine_two', 'value'),
-     Input('cuisine_three', 'value')]
-)
-def build_graph(first_cuisine, second_cuisine, third_cuisine):
-    dff = df[(df['CUISINE DESCRIPTION'] == first_cuisine) |
-             (df['CUISINE DESCRIPTION'] == second_cuisine) |
-             (df['CUISINE DESCRIPTION'] == third_cuisine)]
-    # print(dff[:5])
-
-    fig = px.line(dff, x="INSPECTION DATE", y="SCORE", color='CUISINE DESCRIPTION', height=600)
-    fig.update_layout(yaxis={'title': 'NEGATIVE POINT'},
-                      title={'text': 'Restaurant Inspections in NYC',
-                             'font': {'size': 28}, 'x': 0.5, 'xanchor': 'center'})
-    return fig
-
-
-# ---------------------------------------------------------------
-
-if __name__ == '__main__':
-    app.run_server(debug=False)
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#import mpl_interactions.ipyplot as iplt
 import mpl_interactions.ipyplot as iplt
 import matplotlib.pyplot as plt
 import numpy as np
@@ -218,6 +118,9 @@ def pvalue_101(choice, protein_name, desired_p_val, mu, sigma, samp_size, samp_m
 
 # Set-up program
 # File selection
+
+
+
 root = tkinter.Tk()
 root.withdraw
 fileName1 = tkinter.filedialog.askopenfilename()
@@ -304,4 +207,123 @@ for key,val in sampleData.items():
     #proteinSampleDataMappedToMean[key].append(pvalue_101(graphs, key, desired_p_value, controlDataMappedToMean[key], (int)(proteinSampleDataMappedToMean[key][0]), 100))
     proteinSampleDataMappedToMean[key].append(proteinMeanGraph(key, controlDataMappedToMean[key]))
 
-#print(pvalue_101(controlDataMap["Immunoglobulin lambda variable 3-9"], 20.0, (int)(proteinSampleDataMappedToMean["Immunoglobulin lambda variable 3-9"][0]), 33.0))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app = dash.Dash(__name__)
+
+# ---------------------------------------------------------------
+
+df = pd.read_csv(
+    "C:\\Users\\antho\\Downloads\\DOHMH_New_York_City_Restaurant_Inspection_Results.csv")  # https://drive.google.com/file/d/1jyvSiRjaNIeOCP59dUFQuZ0_N_StiQOr/view?usp=sharing
+df['INSPECTION DATE'] = pd.to_datetime(df['INSPECTION DATE'])
+df = df.groupby(['INSPECTION DATE', 'CUISINE DESCRIPTION', 'CAMIS'], as_index=False)['SCORE'].mean()
+df = df.set_index('INSPECTION DATE')
+df = df.loc['2016-01-01':'2019-12-31']
+df = df.groupby([pd.Grouper(freq="M"), 'CUISINE DESCRIPTION'])['SCORE'].mean().reset_index()
+# print (df[:5])
+
+# ---------------------------------------------------------------
+app.layout = html.Div([
+
+    html.Div([
+        dcc.Graph(id='our_graph')
+    ], className='nine columns'),
+
+    html.Div([
+
+        html.Br(),
+        html.Label(['Choose 3 Cuisines to Compare:'], style={'font-weight': 'bold', "text-align": "center"}),
+        dcc.Dropdown(id='cuisine_one',
+                     options=[{'label': x, 'value': x} for x in
+                              {0,1,2,3,4,5}],
+                     value='African',
+                     multi=False,
+                     disabled=False,
+                     clearable=True,
+                     searchable=True,
+                     placeholder='Choose Cuisine...',
+                     className='form-dropdown',
+                     style={'width': "90%"},
+                     persistence='string',
+                     persistence_type='memory'),
+
+        dcc.Dropdown(id='cuisine_two',
+                     options=[{'label': x, 'value': x} for x in
+                              df.sort_values('CUISINE DESCRIPTION')['CUISINE DESCRIPTION'].unique()],
+                     value='Asian',
+                     multi=False,
+                     clearable=False,
+                     persistence='string',
+                     persistence_type='session'),
+
+        dcc.Dropdown(id='cuisine_three',
+                     options=[{'label': x, 'value': x} for x in
+                              df.sort_values('CUISINE DESCRIPTION')['CUISINE DESCRIPTION'].unique()],
+                     value='Donuts',
+                     multi=False,
+                     clearable=False,
+                     persistence='string',
+                     persistence_type='local'),
+
+    ], className='three columns'),
+
+])
+
+
+# ---------------------------------------------------------------
+
+@app.callback(
+    Output('our_graph', 'figure'),
+    [Input('cuisine_one', 'value'),
+     Input('cuisine_two', 'value'),
+     Input('cuisine_three', 'value')]
+)
+def build_graph(first_cuisine, second_cuisine, third_cuisine):
+    dff = df[(df['CUISINE DESCRIPTION'] == first_cuisine) |
+             (df['CUISINE DESCRIPTION'] == second_cuisine) |
+             (df['CUISINE DESCRIPTION'] == third_cuisine)]
+    # print(dff[:5])
+
+    fig = px.line(dff, x="INSPECTION DATE", y="SCORE", color='CUISINE DESCRIPTION', height=600)
+    fig.update_layout(yaxis={'title': 'NEGATIVE POINT'},
+                      title={'text': 'Restaurant Inspections in NYC',
+                             'font': {'size': 28}, 'x': 0.5, 'xanchor': 'center'})
+    return fig
+
+
+# ---------------------------------------------------------------
+
+if __name__ == '__main__':
+    app.run_server(debug=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
