@@ -26,7 +26,7 @@ app = dash.Dash(__name__)
 # ---------------------------------------------------------------
 
 df = pd.read_csv(
-    "/Users/maggiechen/Downloads/DOHMH_New_York_City_Restaurant_Inspection_Results.csv")  # https://drive.google.com/file/d/1jyvSiRjaNIeOCP59dUFQuZ0_N_StiQOr/view?usp=sharing
+    "C:\\Users\\antho\\Downloads\\DOHMH_New_York_City_Restaurant_Inspection_Results.csv")  # https://drive.google.com/file/d/1jyvSiRjaNIeOCP59dUFQuZ0_N_StiQOr/view?usp=sharing
 df['INSPECTION DATE'] = pd.to_datetime(df['INSPECTION DATE'])
 df = df.groupby(['INSPECTION DATE', 'CUISINE DESCRIPTION', 'CAMIS'], as_index=False)['SCORE'].mean()
 df = df.set_index('INSPECTION DATE')
