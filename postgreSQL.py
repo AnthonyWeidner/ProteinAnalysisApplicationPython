@@ -1,4 +1,7 @@
 import psycopg2
+import main
+
+
 
 con = psycopg2.connect(
     database="TestingDataBase",
@@ -23,8 +26,11 @@ cursor_obj = con.cursor()
 #create_table_script = "CREATE TABLE car (id BIGSERIAL NOT NULL PRIMARY KEY, model VARCHAR(30))"
 #cursor_obj.execute(create_table_script)
 
-create_car_script = "INSERT INTO protein (proteinID) VALUES ("%s")"
-cursor_obj.execute(create_car_script, d[proteinID])
+
+insert_element = "INSERT INTO car (id, model) VALUES (87, 'Toyota')"
+cursor_obj.execute(insert_element)
+
+
 
 con.commit()
 

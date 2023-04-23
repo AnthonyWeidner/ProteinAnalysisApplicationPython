@@ -319,6 +319,7 @@ import plotly.express as px
 app = Dash(__name__)
 
 
+# List of elements on HTML webpage
 app.layout = html.Div([
     html.H2('Covid vs. Non-Covid Protein Expression Application || Property of the Gong Laboratory.'),
     dcc.Dropdown(
