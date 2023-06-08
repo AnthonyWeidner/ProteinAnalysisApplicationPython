@@ -60,7 +60,7 @@ p_val = np.linspace(0,10,100)
 def graph1(x, p_val, mu):
     return x * p_val * mu
 
-
+#test
 
 # ACCEPTANCE CRITERA
 # AC01: if p value, have a list of proteins fitting the p value
@@ -145,12 +145,24 @@ sampleData = {} # goes across each row
 sampleName = ""
 flag = True
 counter = 0
+controlSampleNumbers = [] #column number of control samples
+covidSampleNumbers = [] #column number of covid samples
+covid2wkSampleNumbers = [] #column number of covid 2 week samples
+covid6wkSampleNumbers = [] #column number of covid 6 week samples
 
 for col in range(5, dataFrameReader.max_column):
     arr.append([])
     for row in dataFrameReader.iter_rows(0, dataFrameReader.max_row):
         if flag:
             sampleName = row[col].value
+            if sampleName.find("ctrl") != -1:
+                controlSampleNumbers.append(col)
+            if sampleName.find("Cov") != -1:
+                covidSampleNumbers.append(col)
+                if sampleName.find("2wk") != -1:
+                    covid2wkSampleNumbers.append(col)
+                if sampleName.find("6wk") != -1:
+                    covid6wkSampleNumbers.append(col)
             flag = False
 
         value = row[col].value
@@ -168,19 +180,15 @@ rowCounter = 0
 # Set-up control values
 # Goal: parse through just the control column and store data in dictionary
 controlDataMap = {}
-for row in dataFrameReader.iter_rows(2, dataFrameReader.max_row):
+for row in dataFrameReader.iter_rows(1, dataFrameReader.max_row):
     proteinName = row[2].value
     controlDataMap[proteinName] = []
-    for col in range(5, 13):
+    for col in controlSampleNumbers:
         value = row[col].value
         if not isinstance(value, str):  # Filtered as value
             controlDataMap[proteinName].append(value)
         else:
             controlDataMap[proteinName].append(50)
-
-
-
-
 
 controlDataMappedToMean = {}
 for key,val in controlDataMap.items():
@@ -197,39 +205,105 @@ for key,val in controlDataMap.items():
 # Collect Sample Data
 proteinName_mapped_to_p_value = {}
 proteinName_mapped_to_mean = {}
+numSamples_noCoV = len(controlSampleNumbers)
+numSamples_coV = len(covidSampleNumbers)
+numSamples_coV2wk = len(covid2wkSampleNumbers)
+numSamples_coV6wk = len(covid6wkSampleNumbers)
 
-for row in dataFrameReader.iter_rows(2, dataFrameReader.max_row):
+for row in dataFrameReader.iter_rows(1, dataFrameReader.max_row):
     proteinName = row[2].value
     sampleData[proteinName] = []
 
-    numSamples_coV = 0
-    numSamples_noCoV = 0
-
     coV_mean = 0
     noCoV_mean = 0
+    coV2wk_mean = 0
+    coV6wk_mean = 0
 
+    coV_sum = 0
+    noCoV_sum = 0
+    coV2wk_sum = 0
+    coV6wk_sum = 0
+
+    ctrl_count = []
+    coV_count = []
+    coV2wk_count = []
+    coV6wk_count = []
+    count = 1
+
+    #Switch commented out parts to evaluate ctrl vs cov, cov2wks vs cov6wks
     for col in range(5, dataFrameReader.max_column): # 6 = start of non-control groups
         value = row[col].value
         if not isinstance(value, str):
             sampleData[proteinName].append(value)
-
-            if col >= 13: # fixed value for now
-                numSamples_coV += 1
-            else:
-                numSamples_noCoV += 1
+            """
+            if col in controlSampleNumbers:
+                noCoV_sum += value
+                ctrl_count.append(count)
+                count += 1
+            elif col in covidSampleNumbers:
+                coV_sum += value
+                coV_count.append(count)
+                count += 1
+            """
+            #"""
+            if col in covid2wkSampleNumbers:
+                coV2wk_sum += value
+                coV2wk_count.append(count)
+                count += 1
+            if col in covid6wkSampleNumbers:
+                coV6wk_sum += value
+                coV6wk_count.append(count)
+                count += 1
+            #"""
         else:
             sampleData[proteinName].append(0)
+            """
+            if col in controlSampleNumbers:
+                noCoV_sum += 0
+                ctrl_count.append(count)
+                count += 1
+            elif col in covidSampleNumbers:
+                coV_sum += 0
+                coV_count.append(count)
+                count += 1
+            """
+            #"""
+            if col in covid2wkSampleNumbers:
+                coV2wk_sum += 0
+                coV2wk_count.append(count)
+                count += 1
+            if col in covid6wkSampleNumbers:
+                coV6wk_sum += 0
+                coV6wk_count.append(count)
+                count += 1
+            #"""
 
+    noCoV_mean = noCoV_sum / numSamples_noCoV
+    coV_mean = coV_sum / numSamples_coV
+    coV2wk_mean = coV2wk_sum / numSamples_coV2wk
+    coV6wk_mean = coV6wk_sum / numSamples_coV6wk
 
-    if numSamples_coV != 0 and numSamples_noCoV != 0:
-        coV_mean = sum(sampleData[proteinName][5:13]) / numSamples_coV
-        noCoV_mean = sum(sampleData[proteinName][13:]) / numSamples_noCoV
+    #t-test and p-value mapping
+    a = []
+    b = []
+    """
+    for col in ctrl_count:
+        a.append(sampleData[proteinName][col])
+    for col in coV_count:
+        b.append(sampleData[proteinName][col])
+    """
+    #'''
+    for col in coV2wk_count:
+        a.append(sampleData[proteinName][col])
+    for col in coV6wk_count:
+        b.append(sampleData[proteinName][col])
+    #'''
+    res = scipy.stats.ttest_ind(a, b, equal_var=True)
+    proteinName_mapped_to_p_value[proteinName] = res.pvalue
+    proteinName_mapped_to_mean[proteinName] = "Non-Covid mean: " + str(noCoV_mean) + " | Covid mean: " + str(coV_mean) + " || p-value: " + str(res.pvalue)
+    #proteinName_mapped_to_mean[proteinName] = "Covid 2 wk mean: " + str(CoV2wk_mean) + " | Covid 6 wk mean: " + str(coV6wk_mean) + " || p-value: " + str(res.pvalue)
 
-        res = scipy.stats.ttest_ind(a=sampleData[proteinName][5:13], b=sampleData[proteinName][13:], equal_var=True)
-        proteinName_mapped_to_p_value[proteinName] = res.pvalue
-        proteinName_mapped_to_mean[
-            proteinName] = "Non-Covid mean: " + str(noCoV_mean) + " | Covid mean: " + str(coV_mean) + " || p-value: " + str(res.pvalue)
-    else:
+    if numSamples_coV == 0 and numSamples_noCoV == 0:
         proteinName_mapped_to_p_value[proteinName] = 0.99
         proteinName_mapped_to_mean[proteinName] = "Insufficient Data for statistical significance"
 
@@ -239,6 +313,10 @@ for row in dataFrameReader.iter_rows(2, dataFrameReader.max_row):
 
 # Get Sample Names
 sampleDataListSampleNames = []
+ctrlSamples = []
+coVSamples = []
+coV2wkSamples = []
+coV6wkSamples = []
 colorMap = {}
 for row in dataFrameReader.iter_rows(0, 1):
     for col in range(5, dataFrameReader.max_column):
@@ -247,14 +325,21 @@ for row in dataFrameReader.iter_rows(0, 1):
         s = s.split('_')[0]
         sampleDataListSampleNames.append(s)
 
-        if "noCov" in s:
+        if "ctrl" in s:
             colorMap[s] = "blue"
-        else:
+            ctrlSamples.append(s)
+        if "Cov" in s:
             colorMap[s] = "red"
+            coVSamples.append(s)
+        if "2wk" in s:
+            colorMap[s] = "purple"
+            coV2wkSamples.append(s)
+        if "6wk" in s:
+            colorMap[s] = "pink"
+            coV6wkSamples.append(s)
 
-sampleDataListTestNumbers = [i for i in range(1,16)]
-
-#print(sampleData)
+#sampleDataListCompare = [ctrlSamples, coVSamples]
+sampleDataListCompare = [coV2wkSamples, coV6wkSamples]
 
 
 proteinSampleDataMappedToMean = {}
@@ -328,24 +413,19 @@ app.layout = html.Div([
         value=proteinNamesList[0],
         clearable=False,
     ),
-    dcc.Graph(id="graph"),
     html.Label("Include results only from proteins with a p-value of less than or equal to: "),
     dcc.Slider(0, 1, marks=None, value=0.05, id='slider', tooltip={"placement": "bottom", "always_visible": True}),
     html.Label("Manually enter a p-value: "),
-    dcc.Input(type='number', value=0.05, id='manualinput')
+    dcc.Input(type='number', value=0.05, id='manualinput'),
+    html.H3('Bar Chart'),
+    dcc.Graph(id="graph"),
+    html.H3('Violin Plot'),
+    dcc.Graph(id="violin"),
+    html.H3('Density Heatmap'),
+    dcc.Graph(id="heatmap"),
+    html.H3('Empirical Cumulative Distribution Plot'),
+    dcc.Graph(id="ECDF")
 ])
-
-
-@app.callback(
-    Output("graph", "figure"),
-    Input("dropdown", "value"))
-def update_bar_chart(proteinName):
-    print(proteinName + ": " + proteinName_mapped_to_mean[proteinName])
-    df = {'Samples': sampleDataListSampleNames, 'Detection Levels': sampleData[proteinName]}
-    fig = px.bar(df, x = 'Samples', y='Detection Levels',
-                 color="Samples",
-                 color_discrete_map=colorMap)
-    return fig
 
 @app.callback(
     Output("dropdown", "options"),
@@ -361,6 +441,39 @@ def update_proteins(pVal):
     if pVal is None:
         return 0
     return pVal
+
+@app.callback(
+    Output("graph", "figure"),
+    Input("dropdown", "value"))
+def update_bar_chart(proteinName):
+    print(proteinName + ": " + proteinName_mapped_to_mean[proteinName])
+    df = {'Samples': sampleDataListSampleNames, 'Detection Levels': sampleData[proteinName]}
+    fig = px.bar(df, x = 'Samples', y='Detection Levels', color="Samples", color_discrete_map=colorMap)
+    return fig
+
+@app.callback(
+    Output("violin", "figure"),
+    Input("dropdown", "value"))
+def update_violin_plot(proteinName):
+    df = {'Detection Levels': sampleData[proteinName], 'Sample': sampleDataListSampleNames}
+    fig = px.violin(df, y='Detection Levels', hover_data=['Sample'], color_discrete_map=colorMap, box=True, points="all")
+    return fig
+
+@app.callback(
+    Output("heatmap", "figure"),
+    Input("dropdown", "value"))
+def update_heatmap_plot(proteinName):
+    df = {'Samples': sampleDataListSampleNames, 'Detection Levels': sampleData[proteinName]}
+    fig = px.density_heatmap(df, y='Detection Levels', x='Samples', marginal_x="histogram", marginal_y="histogram")
+    return fig
+
+@app.callback(
+    Output("ECDF", "figure"),
+    Input("dropdown", "value"))
+def update_ECDF_plot(proteinName):
+    df = {'Detection Levels': sampleData[proteinName], 'Sample': sampleDataListSampleNames}
+    fig = px.ecdf(df, x='Detection Levels', hover_data=['Sample'], markers = True)
+    return fig
 
 app.run_server(debug=True)
 
@@ -620,7 +733,5 @@ app.layout = html.Div([
 
 app.run_server(debug=True)
 """
-
-
 
 
